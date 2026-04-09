@@ -2,8 +2,7 @@
 
 一个 macOS 桌面软件合集仓库，每款应用均以 Swift 原生开发，追求极简体验与高性能。
 
-官网文档：[docs/index.html](./docs/index.html)
-
+官网文档：https://joker311223.github.io/switfMacUnion/
 ---
 
 ## 应用列表

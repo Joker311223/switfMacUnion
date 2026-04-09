@@ -32,13 +32,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return false // 关闭窗口不退出，保持在后台以响应热键
+        return false // 关闭窗口不退出，保持后台运行继续监听热键
     }
-    
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !flag {
-            windowController?.showAndFocus()
+
+    // 所有窗口关闭后：切换为 accessory 模式（Dock & 菜单栏消失，状态栏图标保留）
+    func applicationDidResignActive(_ notification: Notification) {
+        let hasVisible = NSApp.windows.contains { $0.isVisible && !$0.isMiniaturized }
+        if !hasVisible {
+            NSApp.setActivationPolicy(.accessory)
         }
+    }
+
+    // 重新激活时：如果变成了 accessory，恢复 regular
+    func applicationWillBecomeActive(_ notification: Notification) {
+        if NSApp.activationPolicy() == .accessory {
+            NSApp.setActivationPolicy(.regular)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        showApp()
         return true
     }
     
@@ -166,6 +180,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Actions
     
     @objc private func showApp() {
+        // 从 accessory 模式唤醒时先恢复 regular，再显示窗口
+        if NSApp.activationPolicy() == .accessory {
+            NSApp.setActivationPolicy(.regular)
+        }
         windowController?.showAndFocus()
     }
 
@@ -195,6 +213,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        HotKeyManager.shared.unregister()
+        HotKeyManager.shared.teardown()
     }
 }

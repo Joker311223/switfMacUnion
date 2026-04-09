@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import Carbon.HIToolbox
 
 // MARK: - 应用配置（UserDefaults 持久化）
 final class AppSettings: ObservableObject {
@@ -128,7 +129,8 @@ final class PreferencesWindowController: NSWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "偏好设置"
+        window.title   = "偏好设置"
+        window.minSize = NSSize(width: 560, height: 400)
         window.center()
         window.setFrameAutosaveName("PrefsWindow")
         super.init(window: window)
@@ -336,15 +338,152 @@ final class AppearancePrefsVC: PrefsBaseVC {
 
 // MARK: - 快捷键设置
 final class HotkeyPrefsVC: PrefsBaseVC {
+
+    // 录制状态下的监控器
+    private var monitor: Any?
+    // 录制按钮引用（用于更新标题）
+    private weak var recordButton: NSButton?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "快捷键"
+        stopRecording()   // 确保监控器清理
 
+        // ── 全局热键（可录制）────────────────────────────
         addSection("全局快捷键")
-        addLabel("当前全局快捷键：⌃⌥Z（唤出最近备忘录）\n修改后需重启生效。")
+        addLabel("点击下方按钮后，按下想要的组合键即可设置。\n需包含 ⌃/⌥/⌘ 中至少一个修饰键。")
 
-        addSection("编辑器快捷键")
-        addLabel("⌘S        手动保存\n⌘N        新建备忘录\n⌘W       关闭窗口\n⌘F        查找\n⌘Z        撤销\n⇧⌘Z      重做\n⌃⌥Z      打开最近备忘录（全局）")
+        // 当前值
+        let currentStr = HotKeyManager.currentShortcutString()
+
+        // 录制按钮
+        let btn = NSButton(title: "当前：\(currentStr)　　点击录制...", target: self,
+                           action: #selector(toggleRecording(_:)))
+        btn.bezelStyle     = .rounded
+        btn.setButtonType(.momentaryPushIn)
+        btn.font           = .monospacedSystemFont(ofSize: 14, weight: .medium)
+        btn.toolTip        = "点击后按下目标组合键"
+        callbacks.append(btn)   // 持有引用防止 ARC 回收
+        recordButton = btn
+        addArrangedButton(btn)
+
+        // 重置默认
+        addButton("恢复默认（⌃⌥Z）") { [weak self] in
+            AppSettings.shared.hotKeyModifiers = Int(controlKey | optionKey)
+            AppSettings.shared.hotKeyCode      = kVK_ANSI_Z
+            HotKeyManager.shared.register()
+            self?.viewDidLoad()
+        }
+
+        // ── 编辑器内置快捷键（只读说明）────────────────────
+        addSection("编辑器内置快捷键")
+        let rows: [(String, String)] = [
+            ("⌘S",   "手动保存"),
+            ("⌘N",   "新建备忘录"),
+            ("⌘K",   "插入超链接"),
+            ("⌘F",   "全文查找"),
+            ("⌘Z",   "撤销"),
+            ("⇧⌘Z",  "重做"),
+            ("⌘W",   "关闭窗口"),
+        ]
+        for (key, desc) in rows {
+            addShortcutRow(key: key, desc: desc)
+        }
+    }
+
+    // ── 开始/停止录制 ────────────────────────────────────
+    @objc private func toggleRecording(_ sender: NSButton) {
+        if monitor != nil {
+            stopRecording()
+        } else {
+            startRecording()
+        }
+    }
+
+    private func startRecording() {
+        recordButton?.title = "⏺ 请按下组合键..."
+        recordButton?.bezelColor = .systemBlue
+
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else { return event }
+
+            let mods  = event.modifierFlags.intersection([.control, .option, .command, .shift])
+            let code  = Int(event.keyCode)
+
+            // 必须有至少一个修饰键，且不是单独的修饰键
+            guard !mods.isEmpty,
+                  ![kVK_Control, kVK_Option, kVK_Command, kVK_Shift,
+                    kVK_RightControl, kVK_RightOption, kVK_RightCommand, kVK_RightShift
+                   ].contains(code) else {
+                return nil   // 吞掉，继续等待
+            }
+
+            // 保存
+            let carbonMods = HotKeyManager.carbonModifiers(from: mods)
+            AppSettings.shared.hotKeyModifiers = carbonMods
+            AppSettings.shared.hotKeyCode      = code
+            HotKeyManager.shared.register()    // 立即生效
+
+            self.stopRecording()
+            self.viewDidLoad()                 // 刷新显示
+            return nil
+        }
+    }
+
+    private func stopRecording() {
+        if let m = monitor {
+            NSEvent.removeMonitor(m)
+            monitor = nil
+        }
+        recordButton?.bezelColor = nil
+    }
+
+    // ── 辅助：只读快捷键行 ───────────────────────────────
+    private func addShortcutRow(key: String, desc: String) {
+        addCustomRow {
+            let lbl = NSTextField(labelWithString: desc)
+            lbl.font      = .systemFont(ofSize: 13)
+            lbl.textColor = .labelColor
+            lbl.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+            let badge = NSTextField(labelWithString: key)
+            badge.font            = .monospacedSystemFont(ofSize: 12, weight: .medium)
+            badge.textColor       = .secondaryLabelColor
+            badge.backgroundColor = .quaternaryLabelColor
+            badge.drawsBackground = true
+            badge.isBezeled       = false
+            badge.alignment       = .center
+            badge.setContentHuggingPriority(.required, for: .horizontal)
+
+            // 给 badge 加圆角（用 layer）
+            badge.wantsLayer  = true
+            badge.layer?.cornerRadius = 4
+            return (lbl, badge)
+        }
+    }
+}
+
+// MARK: - PrefsBaseVC 扩展：支持自定义行 & 直接添加控件
+extension PrefsBaseVC {
+    /// 添加任意 NSButton（不走 ButtonCallback 包装）
+    func addArrangedButton(_ btn: NSButton) {
+        stackView.addArrangedSubview(btn)
+    }
+
+    /// 添加自定义双列行（左侧弹性 label + 右侧固定控件）
+    func addCustomRow(_ build: () -> (NSView, NSView)) {
+        let (left, right) = build()
+        let row = NSStackView()
+        row.orientation  = .horizontal
+        row.distribution = .fill
+        row.alignment    = .centerY
+        row.spacing      = 12
+        row.addView(left,  in: .leading)
+        row.addView(right, in: .trailing)
+        stackView.addArrangedSubview(row)
+        let wc = row.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -48)
+        wc.priority = .defaultHigh
+        wc.isActive = true
     }
 }
 
@@ -447,7 +586,7 @@ private final class FlippedView: NSView {
 // MARK: - 基础偏好设置视图控制器
 class PrefsBaseVC: NSViewController {
 
-    private var stackView  = NSStackView()
+    var stackView  = NSStackView()   // internal：供子类/extension 访问
     private var scrollView = NSScrollView()
     private var container  = FlippedView()   // 翻转容器
     var callbacks: [Any] = []
@@ -620,42 +759,53 @@ class PrefsBaseVC: NSViewController {
         stackView.addArrangedSubview(btn)
     }
 
-    /// 颜色选择行：左边标签 + 中间 hex 文本框 + 右边颜色井（NSColorWell）
+    /// 颜色选择行：左边标签 + 右边 hex 文本框 + 颜色井（NSColorWell）
     func addColorPicker(_ title: String, hex: String, placeholder: String,
                         _ onChange: @escaping (String) -> Void) {
         let row = makeRow()
+        row.distribution = .fill   // 让标签自动填满剩余空间
+
         let lbl = NSTextField(labelWithString: title)
         lbl.font      = .systemFont(ofSize: 13)
         lbl.textColor = .labelColor
-        lbl.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        // 标签可压缩，不强制撑宽
+        lbl.setContentHuggingPriority(.defaultLow,  for: .horizontal)
+        lbl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
-        // 颜色井
+        // Hex 文本框（固定宽度，不参与拉伸）
+        let field = NSTextField(string: hex)
+        field.font              = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        field.placeholderString = placeholder
+        field.bezelStyle        = .roundedBezel
+        field.controlSize       = .small
+        field.setContentHuggingPriority(.required, for: .horizontal)
+        field.setContentCompressionResistancePriority(.required, for: .horizontal)
+        field.widthAnchor.constraint(equalToConstant: 90).isActive = true
+
+        // 颜色井（固定尺寸）
         let well = NSColorWell(style: .minimal)
         well.color = NSColor.fromHex(hex) ?? NSColor.fromHex(placeholder) ?? .labelColor
         well.translatesAutoresizingMaskIntoConstraints = false
+        well.setContentHuggingPriority(.required, for: .horizontal)
+        well.setContentCompressionResistancePriority(.required, for: .horizontal)
         well.widthAnchor.constraint(equalToConstant: 32).isActive  = true
         well.heightAnchor.constraint(equalToConstant: 24).isActive = true
 
-        // Hex 文本框
-        let field = NSTextField(string: hex)
-        field.font           = .monospacedSystemFont(ofSize: 12, weight: .regular)
-        field.placeholderString = placeholder
-        field.bezelStyle     = .roundedBezel
-        field.controlSize    = .small
-        field.widthAnchor.constraint(equalToConstant: 90).isActive = true
-
-        // 颜色井 → 更新文本框
         let cb = ColorPickerCallback(well: well, field: field, onChange: onChange)
         callbacks.append(cb)
-        well.target = cb
-        well.action = #selector(ColorPickerCallback.wellChanged(_:))
+        well.target  = cb
+        well.action  = #selector(ColorPickerCallback.wellChanged(_:))
         field.delegate = cb
 
         row.addView(lbl,   in: .leading)
         row.addView(field, in: .trailing)
         row.addView(well,  in: .trailing)
         stackView.addArrangedSubview(row)
-        row.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -48).isActive = true
+        // 与其他行保持一致：行宽 = stackView 宽度 - 左右 padding（各 24pt）
+        // 优先级设为 defaultHigh（<required），让固定宽度控件优先，标签弹性压缩
+        let wc = row.widthAnchor.constraint(equalTo: stackView.widthAnchor, constant: -48)
+        wc.priority = .defaultHigh
+        wc.isActive = true
     }
 
     private func makeRow() -> NSStackView {
