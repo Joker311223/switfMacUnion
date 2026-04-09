@@ -2,7 +2,7 @@
 
 一个 macOS 桌面软件合集仓库，每款应用均以 Swift 原生开发，追求极简体验与高性能。
 
-官网文档：[website/index.html](./website/index.html)
+官网文档：[docs/index.html](./docs/index.html)
 
 ---
 
@@ -79,7 +79,7 @@ claudeProject/
 │   │   ├── AppIconMaker.swift
 │   │   └── Models.swift
 │   └── Package.swift
-├── website/                # 官网（React 单页）
+├── docs/                   # 官网（React 单页）
 │   └── index.html
 ├── README.md
 └── CLAUDE.md
