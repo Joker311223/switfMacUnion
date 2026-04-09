@@ -31,17 +31,7 @@
 | 新增应用 | 在「应用列表」章节新增一个完整的应用条目，格式参照 MemoApp |
 | 删除功能 | 同步删除对应条目 |
 
-### 2. 更新 `docs/index.html`
-
-官网是单文件 React 应用，数据集中在文件顶部的常量数组里，按以下规则更新：
-
-| 改动类型 | 需要更新的内容 |
-|----------|----------------|
-| 新增功能 | 在 `features` 数组中追加一项 `{ icon, title, desc, color }` |
-| 新增快捷键 | 在 `shortcuts` 数组中追加一项 `{ keys, desc }` |
-| 新增偏好设置项 | 在 `settings` 数组中找到对应 tab，在 `items` 里追加描述字符串 |
-| 新增应用 | 在 Hero 区域的 MockAppWindow 和 Download 区域更新应用介绍，并在 features/shortcuts/settings 中加入该应用的数据 |
-| 删除功能 | 同步删除对应数组项 |
+### 2. 更新 `docs`
 
 ---
 
