@@ -1,0 +1,59 @@
+{
+  "": {
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/master.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/AppDelegate.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppDelegate.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppDelegate.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppDelegate~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppDelegate.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/AppIconMaker.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppIconMaker.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppIconMaker.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppIconMaker~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppIconMaker.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/AppSettings.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppSettings.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppSettings.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppSettings~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/AppSettings.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/HotKeyManager.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/HotKeyManager.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/HotKeyManager.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/HotKeyManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/HotKeyManager.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/MainWindowController.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MainWindowController.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MainWindowController.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MainWindowController~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MainWindowController.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/MarkdownRenderer.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MarkdownRenderer.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MarkdownRenderer.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MarkdownRenderer~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/MarkdownRenderer.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/Models.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/Models.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/Models.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/Models~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/Models.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/SidebarView.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/SidebarView.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/SidebarView.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/SidebarView~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/SidebarView.swiftdeps"
+  },
+  "/Users/joker/claudeProject/MemoApp/MemoApp/main.swift": {
+    "dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/main.d",
+    "object": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/main.swift.o",
+    "swiftmodule": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/joker/claudeProject/MemoApp/.build/arm64-apple-macosx/debug/MemoApp.build/main.swiftdeps"
+  }
+}
