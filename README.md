@@ -105,6 +105,50 @@ swift build
 
 ---
 
+### 🍱 MenuBarManager — 菜单栏图标管理工具
+
+> 常驻菜单栏，解决菜单栏图标被遮挡展示不全的问题。扫描所有运行中的菜单栏应用，支持一键隐藏/显示，折叠溢出图标，让菜单栏始终整洁。
+
+**路径**：`MenuBarManager/`  
+**要求**：macOS 13+，支持 Apple Silicon 与 Intel
+
+#### 核心功能
+
+| 功能 | 说明 |
+|------|------|
+| 自动扫描菜单栏应用 | 实时检测所有具有菜单栏图标的应用（含纯菜单栏 App 与普通 App） |
+| 一键隐藏 / 显示图标 | 在弹出面板或偏好设置中，对每个应用图标单独切换显示状态 |
+| 溢出展开面板 | 点击「⋯」状态栏按钮，弹出完整的图标列表，访问被折叠的应用 |
+| 快捷激活应用 | 在展开面板中点击应用名，直接切换到对应应用 |
+| 最大显示数量设置 | 在偏好设置中自定义菜单栏最多显示几个图标，超出自动折叠 |
+| 纯菜单栏模式 | 可隐藏 Dock 图标，以纯菜单栏 App 方式运行，不占任何屏幕空间 |
+| 数据持久化 | 隐藏/显示设置保存在本地 JSON，重启后自动恢复 |
+
+#### 快捷键速查
+
+| 快捷键 | 功能 |
+|--------|------|
+| `⌘,` | 打开偏好设置 |
+| `⌘R` | 刷新应用列表 |
+| `⌘Q` | 退出 MenuBarManager |
+
+#### 偏好设置面板
+
+- **通用**：菜单栏最大显示数量（Stepper 调节）、溢出指示器开关、开机自启、纯菜单栏模式（隐藏 Dock 图标）
+- **应用管理**：表格列出所有运行中的菜单栏应用，可逐条切换隐藏/显示状态，支持刷新列表
+
+#### 构建方式
+
+```bash
+cd MenuBarManager
+swift build
+
+# 运行
+.build/debug/MenuBarManager
+```
+
+---
+
 ## 项目结构
 
 ```
@@ -121,8 +165,27 @@ claudeProject/
 │   │   ├── AppIconMaker.swift
 │   │   └── Models.swift
 │   └── Package.swift
-├── docs/                   # 官网（React 单页）
-│   └── index.html
+├── VideoClipper/           # VideoClipper 源码
+│   ├── VideoClipper/
+│   │   ├── main.swift
+│   │   ├── AppDelegate.swift
+│   │   └── ...
+│   └── Package.swift
+├── MenuBarManager/         # MenuBarManager 源码
+│   ├── MenuBarManager/
+│   │   ├── main.swift
+│   │   ├── AppDelegate.swift
+│   │   ├── AppIconMaker.swift
+│   │   ├── Models.swift
+│   │   ├── RunningAppsScanner.swift
+│   │   ├── OverflowMenuController.swift
+│   │   └── PreferencesWindowController.swift
+│   └── Package.swift
+├── docs/                   # 官网静态页面
+│   ├── index.html
+│   ├── memoapp.html
+│   ├── videoclipper.html
+│   └── menubarmanager.html
 ├── README.md
 └── CLAUDE.md
 ```

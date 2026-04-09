@@ -183,6 +183,7 @@
     }
     .app-card.memo::before   { background: radial-gradient(ellipse at top left, rgba(124,111,224,.12), transparent 65%); }
     .app-card.video::before  { background: radial-gradient(ellipse at top left, rgba(92,184,228,.12), transparent 65%); }
+    .app-card.menu::before   { background: radial-gradient(ellipse at top left, rgba(74,222,128,.12), transparent 65%); }
     .app-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.16); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
     .app-card:hover::before { opacity: 1; }
 
@@ -194,6 +195,7 @@
     }
     .app-icon.memo  { background: linear-gradient(135deg, #7c6fe0, #a78bfa); }
     .app-icon.video { background: linear-gradient(135deg, #5cb8e4, #38bdf8); }
+    .app-icon.menu  { background: linear-gradient(135deg, #4ade80, #22d3ee); }
 
     .card-meta { flex: 1; }
     .card-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
@@ -208,6 +210,7 @@
     }
     .tag.accent { background: rgba(124,111,224,0.2); color: #c4baff; }
     .tag.blue   { background: rgba(92,184,228,0.2);  color: #93d9f5; }
+    .tag.green  { background: rgba(74,222,128,0.2);  color: #86efac; }
 
     .card-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
     .card-feature {
@@ -316,7 +319,7 @@
 
   <div class="stats">
     <div class="stat">
-      <div class="num">2</div>
+      <div class="num">3</div>
       <div class="label">款原生应用</div>
     </div>
     <div class="stat">
@@ -339,7 +342,7 @@
   <div class="container">
     <div class="section-label">应用列表</div>
     <div class="section-title">每款工具，专注一件事</div>
-    <div class="section-desc">从备忘录到视频裁剪，每款应用均以原生 Swift 开发，无任何第三方框架依赖。</div>
+    <div class="section-desc">从备忘录、视频裁剪到菜单栏管理，每款应用均以原生 Swift 开发，无任何第三方框架依赖。</div>
 
     <div class="apps-grid">
       <!-- MemoApp -->
@@ -394,6 +397,34 @@
         </div>
         <div class="card-footer">
           <span class="card-version">macOS 13+  ·  Apple Silicon & Intel</span>
+          <div class="card-arrow">→</div>
+        </div>
+      </a>
+
+      <!-- MenuBarManager -->
+      <a href="https://joker311223.github.io/switfMacUnion/menubarmanager" class="app-card menu">
+        <div class="card-header">
+          <div class="app-icon menu">🍱</div>
+          <div class="card-meta">
+            <div class="card-name">MenuBarManager</div>
+            <div class="card-desc">菜单栏图标管理工具，解决图标展示不全的问题，折叠溢出图标并一键展开。</div>
+          </div>
+        </div>
+        <div class="card-tags">
+          <span class="tag green">菜单栏</span>
+          <span class="tag green">图标管理</span>
+          <span class="tag">溢出折叠</span>
+          <span class="tag">后台常驻</span>
+        </div>
+        <div class="card-features">
+          <div class="card-feature"><span class="check">✓</span> 自动扫描所有菜单栏应用图标</div>
+          <div class="card-feature"><span class="check">✓</span> 一键隐藏 / 显示任意应用图标</div>
+          <div class="card-feature"><span class="check">✓</span> 点击「⋯」展开溢出图标面板</div>
+          <div class="card-feature"><span class="check">✓</span> 自定义最大显示数量</div>
+          <div class="card-feature"><span class="check">✓</span> 纯菜单栏模式，不占 Dock 空间</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-version">macOS 13+  ·  Apple Silicon &amp; Intel</span>
           <div class="card-arrow">→</div>
         </div>
       </a>
@@ -456,6 +487,7 @@
       <div class="tech-pill"><span class="icon">💾</span> UserDefaults + JSON</div>
       <div class="tech-pill"><span class="icon">🎛</span> Carbon HIToolbox (HotKey)</div>
       <div class="tech-pill"><span class="icon">🎬</span> AVFoundation (VideoClipper)</div>
+      <div class="tech-pill"><span class="icon">🍱</span> NSWorkspace (MenuBarManager)</div>
     </div>
   </div>
 </section>
@@ -469,6 +501,8 @@
     <a href="https://joker311223.github.io/switfMacUnion/memoapp">MemoApp</a>
     &nbsp;·&nbsp;
     <a href="https://joker311223.github.io/switfMacUnion/videoclipper">VideoClipper</a>
+    &nbsp;·&nbsp;
+    <a href="https://joker311223.github.io/switfMacUnion/menubarmanager">MenuBarManager</a>
   </p>
 </footer>
 
