@@ -62,6 +62,42 @@ swift build
 
 ---
 
+### 📊 iBarApp — 菜单栏图标管理工具
+
+> 一键折叠/展开菜单栏图标隐藏区域，纯后台运行，告别杂乱菜单栏。
+
+**路径**：`iBarApp/`  
+**要求**：macOS 13+，支持 Apple Silicon 与 Intel
+
+#### 核心功能
+
+| 功能 | 说明 |
+|------|------|
+| 一键折叠 / 展开 | 点击菜单栏箭头按钮，带动画切换折叠与展开状态 |
+| 自定义折叠宽度 | 偏好设置中拖动滑块（50–400 pt）精确控制隐藏范围 |
+| 鼠标离开自动折叠 | 鼠标离开覆盖区域后自动收起，延迟时间（1–10 秒）可配置 |
+| 深色/浅色自适应 | 覆盖层颜色跟随系统外观，或手动固定为深色/浅色 |
+| 零存在感后台运行 | 纯状态栏应用，无 Dock 图标，无主窗口，完全不打扰 |
+| 启动自动折叠 | 支持启动时自动进入折叠状态，开机即整洁 |
+
+#### 偏好设置面板
+
+- **折叠区域**：折叠宽度调节（50–400 pt）、实时预览
+- **自动折叠**：启动时自动折叠、鼠标离开后自动折叠、延迟时间设置
+- **外观**：显示/隐藏分隔线、覆盖层颜色模式（跟随系统/深色/浅色）
+
+#### 构建方式
+
+```bash
+cd iBarApp
+swift build
+
+# 运行（纯状态栏应用，无 Dock 图标）
+.build/debug/iBarApp
+```
+
+---
+
 ### ✂️ VideoClipper — 视频多段裁剪工具
 
 > 可视化时间轴选区，多段裁剪后灵活导出：分别保存、拼接合并或两者兼得。
@@ -121,6 +157,16 @@ claudeProject/
 │   │   ├── AppIconMaker.swift
 │   │   └── Models.swift
 │   └── Package.swift
+├── iBarApp/                # iBarApp 源码
+│   ├── iBarApp/
+│   │   ├── main.swift
+│   │   ├── AppDelegate.swift
+│   │   ├── BarItemManager.swift
+│   │   ├── BarOverlayWindow.swift
+│   │   ├── IBarPreferencesController.swift
+│   │   ├── AppSettings.swift
+│   │   └── AppIconMaker.swift
+│   └── Package.swift
 ├── VideoClipper/           # VideoClipper 源码
 │   ├── VideoClipper/
 │   │   ├── main.swift
@@ -130,6 +176,7 @@ claudeProject/
 ├── docs/                   # 官网静态页面
 │   ├── index.html
 │   ├── memoapp.html
+│   ├── ibarapp.html
 │   └── videoclipper.html
 ├── README.md
 └── CLAUDE.md
@@ -138,5 +185,5 @@ claudeProject/
 ---
 
 ## 新增应用
-
+新增应用时，需要注意应用的图标，一定需要给其生成
 每新增一款应用，请在此 README 的「应用列表」章节追加对应条目，格式参照 MemoApp 部分，并同步更新 `website/index.html`。详见 [CLAUDE.md](./CLAUDE.md)。
