@@ -185,5 +185,5 @@ claudeProject/
 ---
 
 ## 新增应用
-新增应用时，需要注意应用的图标，一定需要给其生成
+打包应用时，注意需要在 在 Info.plist 中添加键 CFBundleIconFile 以配置图表
 每新增一款应用，请在此 README 的「应用列表」章节追加对应条目，格式参照 MemoApp 部分，并同步更新 `website/index.html`。详见 [CLAUDE.md](./CLAUDE.md)。
