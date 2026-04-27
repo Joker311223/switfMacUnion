@@ -214,5 +214,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationWillTerminate(_ notification: Notification) {
         HotKeyManager.shared.teardown()
+        // 应用退出前强制保存当前正在编辑的内容
+        if let root = windowController?.window?.contentViewController as? RootSplitViewController {
+            root.mainVC.flushDraftOnClose()
+        }
     }
 }

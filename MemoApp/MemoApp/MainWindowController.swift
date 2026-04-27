@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 
 // MARK: - 主窗口控制器
-final class MainWindowController: NSWindowController, NSToolbarDelegate {
+final class MainWindowController: NSWindowController, NSToolbarDelegate, NSWindowDelegate {
 
     static weak var current: MainWindowController?
 
@@ -37,6 +37,7 @@ final class MainWindowController: NSWindowController, NSToolbarDelegate {
 
         self.init(window: window)
         MainWindowController.current = self
+        window.delegate = self   // 监听窗口事件（关闭、最小化等）
 
         let toolbar = NSToolbar(identifier: "MainToolbar")
         toolbar.delegate                = self
@@ -57,6 +58,12 @@ final class MainWindowController: NSWindowController, NSToolbarDelegate {
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    // MARK: - NSWindowDelegate：窗口关闭时强制保存
+    func windowWillClose(_ notification: Notification) {
+        guard let root = window?.contentViewController as? RootSplitViewController else { return }
+        root.mainVC.flushDraftOnClose()
     }
 
     // MARK: - 置顶
@@ -337,6 +344,59 @@ final class RootSplitViewController: NSSplitViewController {
     }
 }
 
+// MARK: - 草稿缓存（Draft Cache）
+/// 仿照 Typora / Bear 等编辑器：编辑中的内容实时写入 UserDefaults，
+/// 即使窗口被意外关闭或应用崩溃，下次打开时也能自动恢复。
+final class DraftCache {
+    static let shared = DraftCache()
+    private init() {}
+
+    private let keyPrefix = "MemoApp.draft."
+    private let allKeysKey = "MemoApp.draftKeys"
+
+    /// 保存草稿（memoId → 内容）
+    func saveDraft(for memoId: UUID, content: String) {
+        let key = keyPrefix + memoId.uuidString
+        UserDefaults.standard.set(content, forKey: key)
+        // 记录 key 集合，方便清理
+        var keys = allDraftKeys()
+        keys.insert(memoId.uuidString)
+        UserDefaults.standard.set(Array(keys), forKey: allKeysKey)
+    }
+
+    /// 读取草稿；如果没有草稿返回 nil
+    func draft(for memoId: UUID) -> String? {
+        let key = keyPrefix + memoId.uuidString
+        return UserDefaults.standard.string(forKey: key)
+    }
+
+    /// 清除单条草稿（已成功保存后调用）
+    func clearDraft(for memoId: UUID) {
+        let key = keyPrefix + memoId.uuidString
+        UserDefaults.standard.removeObject(forKey: key)
+        var keys = allDraftKeys()
+        keys.remove(memoId.uuidString)
+        UserDefaults.standard.set(Array(keys), forKey: allKeysKey)
+    }
+
+    /// 是否存在未保存草稿
+    func hasDraft(for memoId: UUID) -> Bool {
+        draft(for: memoId) != nil
+    }
+
+    /// 清除所有草稿
+    func clearAll() {
+        for id in allDraftKeys() {
+            UserDefaults.standard.removeObject(forKey: keyPrefix + id)
+        }
+        UserDefaults.standard.removeObject(forKey: allKeysKey)
+    }
+
+    private func allDraftKeys() -> Set<String> {
+        Set(UserDefaults.standard.stringArray(forKey: allKeysKey) ?? [])
+    }
+}
+
 // MARK: - 数据中心
 struct DataStore {
     static var shared = DataStore()
@@ -425,6 +485,9 @@ final class MainViewController: NSViewController {
             // 字数更新
             MainWindowController.current?.updateWordCount(text)
 
+            // 实时写入草稿缓存（防止异常关闭丢失内容）
+            DraftCache.shared.saveDraft(for: memo.id, content: text)
+
             // 防抖自动保存
             let delay = AppSettings.shared.autoSaveEnabled ? AppSettings.shared.autoSaveDelay : 999
             self.saveTimer?.invalidate()
@@ -444,7 +507,20 @@ final class MainViewController: NSViewController {
     private func autoSave() {
         guard let memo = currentMemo else { return }
         onContentChange?(memo)
+        DraftCache.shared.clearDraft(for: memo.id)  // 成功保存后清除草稿
         setDirty(false)
+    }
+
+    /// 窗口即将关闭时调用：强制将未保存内容写入草稿缓存
+    func flushDraftOnClose() {
+        saveTimer?.invalidate()
+        guard let memo = currentMemo else { return }
+        if isDirty {
+            // 先尝试直接保存到 DataStore
+            onContentChange?(memo)
+            DraftCache.shared.clearDraft(for: memo.id)
+            setDirty(false)
+        }
     }
 
     @objc func manualSave() {
@@ -453,13 +529,62 @@ final class MainViewController: NSViewController {
     }
 
     func load(memo: Memo) {
-        saveTimer?.invalidate()
+        // 切换 memo 前先将当前未保存内容强制保存
+        if isDirty, let current = currentMemo {
+            saveTimer?.invalidate()
+            onContentChange?(current)
+            DraftCache.shared.clearDraft(for: current.id)
+            setDirty(false)
+        }
+
         currentMemo = memo
-        editorVC.setText(memo.content)
-        previewVC.render(memo.content)
-        setDirty(false)
-        MainWindowController.current?.updateWordCount(memo.content)
-        view.window?.title = memo.displayTitle.isEmpty ? "备忘录" : memo.displayTitle
+
+        // 检查是否有未提交的草稿（上次异常关闭留下的）
+        if let draft = DraftCache.shared.draft(for: memo.id), draft != memo.content {
+            // 弹出恢复提示
+            restoreDraftIfNeeded(memo: memo, draft: draft)
+        } else {
+            editorVC.setText(memo.content)
+            previewVC.render(memo.content)
+            setDirty(false)
+            MainWindowController.current?.updateWordCount(memo.content)
+            view.window?.title = memo.displayTitle.isEmpty ? "备忘录" : memo.displayTitle
+        }
+    }
+
+    /// 弹出草稿恢复对话框
+    private func restoreDraftIfNeeded(memo: Memo, draft: String) {
+        let alert = NSAlert()
+        alert.messageText     = "发现未保存的草稿"
+        alert.informativeText = "上次编辑「\(memo.displayTitle)」时有内容未保存，是否恢复？"
+        alert.addButton(withTitle: "恢复草稿")
+        alert.addButton(withTitle: "丢弃草稿")
+        alert.alertStyle = .informational
+
+        // 用 icon 让提示更友好
+        alert.icon = NSImage(systemSymbolName: "doc.badge.clock", accessibilityDescription: nil)
+
+        let resp = alert.runModal()
+        if resp == .alertFirstButtonReturn {
+            // 恢复草稿
+            editorVC.setText(draft)
+            previewVC.render(draft)
+            var updated = memo
+            updated.content   = draft
+            updated.updatedAt = Date()
+            currentMemo = updated
+            setDirty(true)  // 标记为未保存，用户可以继续编辑后保存
+            MainWindowController.current?.updateWordCount(draft)
+            view.window?.title = updated.displayTitle.isEmpty ? "备忘录" : updated.displayTitle
+        } else {
+            // 丢弃草稿
+            DraftCache.shared.clearDraft(for: memo.id)
+            editorVC.setText(memo.content)
+            previewVC.render(memo.content)
+            setDirty(false)
+            MainWindowController.current?.updateWordCount(memo.content)
+            view.window?.title = memo.displayTitle.isEmpty ? "备忘录" : memo.displayTitle
+        }
     }
 
     func clearEditor() {
