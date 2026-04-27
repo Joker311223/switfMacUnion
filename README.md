@@ -62,39 +62,40 @@ swift build
 
 ---
 
-### 📊 iBarApp — 菜单栏图标管理工具
+### 🌳 KnowledgeTree — 个人知识树管理工具
 
-> 一键折叠/展开菜单栏图标隐藏区域，纯后台运行，告别杂乱菜单栏。
+> 本地 JSON 驱动的无限层级知识树，配套 AI Skill 智能更新知识库。
 
-**路径**：`iBarApp/`  
+**路径**：`KnowledgeTree/`  
 **要求**：macOS 13+，支持 Apple Silicon 与 Intel
 
 #### 核心功能
 
 | 功能 | 说明 |
 |------|------|
-| 一键折叠 / 展开 | 点击菜单栏箭头按钮，带动画切换折叠与展开状态 |
-| 自定义折叠宽度 | 偏好设置中拖动滑块（50–400 pt）精确控制隐藏范围 |
-| 鼠标离开自动折叠 | 鼠标离开覆盖区域后自动收起，延迟时间（1–10 秒）可配置 |
-| 深色/浅色自适应 | 覆盖层颜色跟随系统外观，或手动固定为深色/浅色 |
-| 零存在感后台运行 | 纯状态栏应用，无 Dock 图标，无主窗口，完全不打扰 |
-| 启动自动折叠 | 支持启动时自动进入折叠状态，开机即整洁 |
-
-#### 偏好设置面板
-
-- **折叠区域**：折叠宽度调节（50–400 pt）、实时预览
-- **自动折叠**：启动时自动折叠、鼠标离开后自动折叠、延迟时间设置
-- **外观**：显示/隐藏分隔线、覆盖层颜色模式（跟随系统/深色/浅色）
+| 无限层级知识树 | 支持任意深度嵌套，缩进式树形展示，带折叠/展开动画 |
+| 本地 JSON 存储 | 每棵树独立 .json 文件，可自由配置存储目录 |
+| 节点动画 | 新增节点弹入动画 + 高亮闪烁，编辑有视觉反馈 |
+| 节点富文本 | 内容支持 Markdown，含标签、颜色、SF Symbol 图标 |
+| 全局搜索 | 实时搜索标题/内容/标签，高亮匹配词 |
+| 多树管理 | 左侧边栏管理多棵知识树，支持创建/删除/重命名 |
+| 节点编辑 | 右侧详情面板，支持标题/内容/标签/颜色/扩展字段编辑 |
+| 缩放控制 | 右下角缩放按钮，支持 30%~250% 缩放 |
+| 偏好设置 | 配置存储目录、自动保存间隔、动画开关等 |
+| AI Skill | 配套 `knowledge-tree-updater` Skill，AI 分析对话自动更新知识库 |
 
 #### 构建方式
 
 ```bash
-cd iBarApp
-swift build
-
-# 运行（纯状态栏应用，无 Dock 图标）
-.build/debug/iBarApp
+cd KnowledgeTree
+bash build_app.sh
+open KnowledgeTree.app
 ```
+
+#### 知识库目录
+
+默认存储在 `~/Documents/KnowledgeTree/`，可在偏好设置中修改。  
+每棵知识树存储为独立的 JSON 文件，可直接查看/编辑/备份。
 
 ---
 
@@ -157,16 +158,6 @@ claudeProject/
 │   │   ├── AppIconMaker.swift
 │   │   └── Models.swift
 │   └── Package.swift
-├── iBarApp/                # iBarApp 源码
-│   ├── iBarApp/
-│   │   ├── main.swift
-│   │   ├── AppDelegate.swift
-│   │   ├── BarItemManager.swift
-│   │   ├── BarOverlayWindow.swift
-│   │   ├── IBarPreferencesController.swift
-│   │   ├── AppSettings.swift
-│   │   └── AppIconMaker.swift
-│   └── Package.swift
 ├── VideoClipper/           # VideoClipper 源码
 │   ├── VideoClipper/
 │   │   ├── main.swift
@@ -176,7 +167,6 @@ claudeProject/
 ├── docs/                   # 官网静态页面
 │   ├── index.html
 │   ├── memoapp.html
-│   ├── ibarapp.html
 │   └── videoclipper.html
 ├── README.md
 └── CLAUDE.md
